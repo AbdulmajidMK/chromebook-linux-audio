@@ -1,0 +1,56 @@
+***The Error is:***
+
+```  File "./setup-audio", line 91
+    match boards[device_board]:
+          ^
+SyntaxError: invalid syntax
+```
+***This error is due to the `match` statement is a new feature introduced in Python 3.10***
+So We can fix it either:
+1. Upgrade Python to 3.10 or later
+2. Refactor the Code to Work with Older Python Versions
+
+The Origibal Code is:
+```
+    try:
+        match boards[device_board]:
+            case "bdw" | "byt" | "bsw":
+                hifi2_audio()
+            case "skl" | "kbl":
+                avs_audio()
+            case "apl":
+                apl_audio()
+            case "glk" | "cml" | "jsl" | "tgl" | "adl":
+                sof_audio(boards[device_board])
+            case "stoney" | "picasso" | "cezanne" | "mendocino":
+                amd_audio(boards[device_board])
+            case "mt8183":
+                # mt8183 only needs ucm, so just pass to make the check happy
+                pass
+            case _:
+                print_error(f"Unknown/Unsupported chromebook model: {device_board}")
+                exit(1)
+```
+
+
+The Reverted one is:
+
+```
+try:
+    if boards[device_board] in ["bdw", "byt", "bsw"]:
+        hifi2_audio()
+    elif boards[device_board] in ["skl", "kbl"]:
+        avs_audio()
+    elif boards[device_board] == "apl":
+        apl_audio()
+    elif boards[device_board] in ["glk", "cml", "jsl", "tgl", "adl"]:
+        sof_audio(boards[device_board])
+    elif boards[device_board] in ["stoney", "picasso", "cezanne", "mendocino"]:
+        amd_audio(boards[device_board])
+    elif boards[device_board] == "mt8183":
+        # mt8183 only needs ucm, so just pass to make the check happy
+        pass
+    else:
+        print_error(f"Unknown/Unsupported chromebook model: {device_board}")
+        exit(1)
+```
